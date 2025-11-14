@@ -1,0 +1,93 @@
+# Combined .gitignore for monorepo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+backend/.venv/
+
+# Django
+*.log
+local_settings.py
+backend/db.sqlite3
+backend/test_db.sqlite3
+backend/test_course_db.sqlite3
+backend/media/
+backend/staticfiles/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# Node.js
+node_modules/
+frontend/node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Poetry
+poetry.lock
+
+# pnpm
+pnpm-lock.yaml
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Production
+frontend/build/
+
+# Vercel
+.vercel

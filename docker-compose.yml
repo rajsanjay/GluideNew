@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Redis for Celery broker and caching (OPTIONAL)
+  # Only use if you don't have an existing Redis instance
+  redis:
+    image: redis:7-alpine
+    container_name: gluide-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - gluide-network
+
+  # Celery Worker (OPTIONAL - for development)
+  # celery-worker:
+  #   build: ./backend
+  #   command: celery -A config worker -l info
+  #   depends_on:
+  #     - redis
+  #   env_file:
+  #     - ./backend/.env
+  #   volumes:
+  #     - ./backend:/app
+  #   networks:
+  #     - gluide-network
+
+  # Celery Beat (OPTIONAL - for scheduled tasks)
+  # celery-beat:
+  #   build: ./backend
+  #   command: celery -A config beat -l info
+  #   depends_on:
+  #     - redis
+  #   env_file:
+  #     - ./backend/.env
+  #   volumes:
+  #     - ./backend:/app
+  #   networks:
+  #     - gluide-network
+
+volumes:
+  redis_data:
+
+networks:
+  gluide-network:
+    driver: bridge
+
+# NOTE: PostgreSQL databases are EXISTING external services
+# DO NOT create PostgreSQL containers here
+# Configure database connections in backend/.env.database
