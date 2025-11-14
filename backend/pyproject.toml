@@ -1,87 +1,74 @@
 [tool.poetry]
-name = "gluide-backend"
-version = "0.1.0"
-description = "Consolidated Django backend for Gluide application"
-authors = ["Gluide Team"]
-readme = "README.md"
-packages = [{include = "api"}, {include = "gluideme"}, {include = "gluideai"}, {include = "config"}]
+name = "gluide-me-backend"
+version = "1.0.0"
+description = "Gluide-Me Consolidated Backend"
+authors = []
 
 [tool.poetry.dependencies]
 python = "^3.11"
-# Django and REST Framework
+
+# Core Framework (from doc lines 46-52)
 Django = "5.1.1"
 djangorestframework = "3.15.2"
-django-cors-headers = "^4.3.0"
+daphne = "4.1.2"
+django-channels = "4.1.0"
+channels-redis = "4.2.0"
 
-# Database
-psycopg2-binary = "^2.9.9"
+# Database & Storage (from doc lines 54-62)
+psycopg2-binary = "2.9.9"
+django-storages = "1.14.4"
+boto3 = "1.35.39"
+redis = "5.0.0"
 
-# Celery for async tasks
-celery = "^5.3.4"
-django-celery-beat = "^2.5.0"
-django-celery-results = "^2.5.1"
-redis = "^5.0.1"
+# AI/ML Stack (from doc lines 64-73)
+langgraph = "0.2.60"
+langchain = "0.3.16"
+langchain-openai = "0.2.3"
+vanna = "0.7.5"
+pinecone-client = "5.0.1"
+cerebras-cloud-sdk = "1.15.0"
+langfuse = "2.58.0"
+litellm = "1.50.3"
 
-# External services
-boto3 = "^1.34.0"  # AWS S3
-pinecone-client = "^3.0.0"
-meilisearch = "^0.31.0"
-openai = "^1.12.0"
+# Search & Indexing (from doc lines 75-78)
+meilisearch = "0.31.5"
 
-# Utilities
-python-dotenv = "^1.0.0"
-pillow = "^10.2.0"
-requests = "^2.31.0"
+# Authentication (from doc lines 80-84)
+django-allauth = "64.2.1"
+djangorestframework-simplejwt = "5.3.1"
 
-[tool.poetry.group.dev.dependencies]
-# Development tools
-black = "^24.1.0"
-flake8 = "^7.0.0"
-isort = "^5.13.0"
-mypy = "^1.8.0"
-pytest = "^8.0.0"
-pytest-django = "^4.7.0"
-pytest-cov = "^4.1.0"
-django-debug-toolbar = "^4.2.0"
-ipython = "^8.20.0"
+# Document Processing (from doc lines 86-92)
+weasyprint = "62.3"
+kaleido = "0.2.1"
+qrcode = "7.4.2"
+markdown2 = "2.5.1"
+
+# Geolocation (from doc lines 94-99)
+geopy = "2.4.1"
+
+# Logging (from doc lines 101-107)
+loguru = "0.7.3"
+logtail-python = "0.3.2"
+
+# Server (from doc lines 109-112)
+gunicorn = "23.0.0"
+gevent = "24.10.3"
+
+# Celery for transcript parser
+celery = "5.4.0"
+django-celery-results = "2.5.1"
+pdf2image = "1.17.0"
+pydantic = "2.9.2"
+python-dotenv = "1.0.1"
+jinja2 = "3.1.4"
+requests = "2.32.3"
+
+# Testing
+pytest = "8.3.3"
+pytest-django = "4.9.0"
+factory-boy = "3.3.1"
+faker = "30.8.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.black]
-line-length = 120
-target-version = ['py311']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | migrations
-)/
-'''
-
-[tool.isort]
-profile = "black"
-line_length = 120
-skip_glob = ["*/migrations/*"]
-
-[tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings_test"
-python_files = ["test_*.py", "*_test.py"]
-addopts = "--cov=. --cov-report=html --cov-report=term-missing"
-testpaths = ["tests"]
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
-ignore_missing_imports = true
