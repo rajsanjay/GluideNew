@@ -1,45 +1,47 @@
 """
 Test mode settings for Gluide application.
-Uses synthetic fixture data instead of connecting to real databases.
+Uses in-memory SQLite databases for fast testing.
 """
 
 from .settings import *
 
-# Override to use test mode
-USE_TEST_MODE = True
-GENERATE_FIXTURES = True
-
-# Use SQLite for test mode (in-memory or file-based)
+# TEST MODE: Use in-memory SQLite databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'test_db.sqlite3',
+        'NAME': ':memory:',
     },
     'course_db': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'test_course_db.sqlite3',
+        'NAME': ':memory:',
     }
 }
 
-# Database router for test mode
-DATABASE_ROUTERS = ['db_routers.TestDatabaseRouter']
+# Override GIS backend for testing (SQLite doesn't support PostGIS)
+# Models with PostGIS fields will use regular fields in test mode
+SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
-# Disable external services in test mode
-PINECONE_API_KEY = 'test-mode-disabled'
-MEILISEARCH_HOST = 'test-mode-disabled'
-OPENAI_API_KEY = 'test-mode-disabled'
-USE_S3 = False
+# Fast password hashing for tests
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+]
 
-# Use local cache in test mode
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocalMemoryCache',
-        'LOCATION': 'test-cache',
-    }
-}
+# Disable migrations in test mode
+class DisableMigrations:
+    def __contains__(self, item):
+        return True
+    def __getitem__(self, item):
+        return None
 
-# Optional: Use in-memory broker for Celery in test mode
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True
+MIGRATION_MODULES = DisableMigrations()
 
-print("🧪 Running in TEST MODE with synthetic data")
+# Load fixtures automatically
+FIXTURE_DIRS = [
+    os.path.join(BASE_DIR, 'api', 'fixtures'),
+    os.path.join(BASE_DIR, 'gluideme', 'fixtures'),
+]
+
+# Test mode flag
+USE_TEST_MODE = True
+
+print("🧪 Running in TEST MODE with in-memory SQLite databases")

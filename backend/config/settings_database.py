@@ -5,63 +5,42 @@ Connects to existing PostgreSQL databases and external services.
 
 from .settings import *
 
-# Override to use database mode
-USE_TEST_MODE = False
-
-# Connect to EXISTING PostgreSQL databases
+# DATABASE MODE: Connect to existing PostgreSQL databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'gluide_me'),
-        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     },
     'course_db': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_DATABASE', 'course_db'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.getenv('DB_DATABASE'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
-# Database router for production mode
-DATABASE_ROUTERS = ['db_routers.ProductionDatabaseRouter']
+# External services (existing infrastructure)
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-west-2')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
-# Redis configuration (existing service)
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
-REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+PINECONE_API_KEY = os.getenv('PINECONE_API_KEY')
+PINECONE_ENVIRONMENT = os.getenv('PINECONE_ENVIRONMENT')
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': REDIS_URL,
-    }
-}
+MEILISEARCH_HOST = os.getenv('MEILISEARCH_HOST', 'http://localhost:7700')
+MEILISEARCH_API_KEY = os.getenv('MEILISEARCH_API_KEY')
 
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-# External services (existing)
-PINECONE_API_KEY = os.environ.get('PINECONE_API_KEY', '')
-PINECONE_ENVIRONMENT = os.environ.get('PINECONE_ENVIRONMENT', '')
-PINECONE_INDEX_NAME = os.environ.get('PINECONE_INDEX_NAME', '')
+# Test mode flag
+USE_TEST_MODE = False
 
-MEILISEARCH_HOST = os.environ.get('MEILISEARCH_HOST', '')
-MEILISEARCH_API_KEY = os.environ.get('MEILISEARCH_API_KEY', '')
-
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
-
-# AWS S3 (existing bucket)
-USE_S3 = os.environ.get('USE_S3', 'True') == 'True'
-if USE_S3:
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
-
-print("🗄️  Running in DATABASE MODE with real PostgreSQL")
+print("🗄️  Running in DATABASE MODE with existing PostgreSQL databases")
