@@ -1,82 +1,46 @@
 """
-Models for GluideAI transcript parsing.
+Pydantic models for transcript parser.
+These models validate and structure data from LLM transcript parsing.
+Reference: REWRITE_SPECIFICATION.md lines 272-363
 """
 
-from django.db import models
-from api.models import Transcript
+from pydantic import BaseModel, Field, field_validator
+from typing import List, Optional
 
 
-class ParsedTranscriptData(models.Model):
-    """Parsed transcript data extracted by AI."""
-    transcript = models.OneToOneField(Transcript, on_delete=models.CASCADE, related_name='parsed_details')
-    student_name = models.CharField(max_length=200, blank=True)
-    student_id = models.CharField(max_length=50, blank=True)
-    school_name = models.CharField(max_length=200, blank=True)
-    graduation_date = models.DateField(null=True, blank=True)
-    gpa = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
-    total_credits = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    courses_data = models.JSONField(default=list, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class Course(BaseModel):
+    """
+    Single course from transcript.
+    CRITICAL: Field names must match EXACTLY as they appear in webhook payload.
+    Reference: REWRITE_SPECIFICATION.md lines 241-262
+    """
+    college: str = Field(description="Name of the college/university")
+    major: Optional[str] = Field(None, description="Student's major if mentioned")
+    semester: str = Field(description="Semester (e.g., Fall, Spring, Summer)")
+    year: str = Field(description="Year (e.g., 2023, 2024)")
+    course_code: str = Field(description="Course code (e.g., CS 61A, MATH 54)")
+    course_title: str = Field(description="Full course title")
+    credit: str = Field(description="Credit units as string (e.g., '4.00', '3.00')")
+    grade: str = Field(description="Letter grade (e.g., A, B+, C)")
 
-    class Meta:
-        db_table = 'parsed_transcript_data'
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"Parsed data for {self.transcript.file_name}"
-
-
-class ParsedCourse(models.Model):
-    """Individual course parsed from transcript."""
-    parsed_transcript = models.ForeignKey(ParsedTranscriptData, on_delete=models.CASCADE, related_name='courses')
-    course_code = models.CharField(max_length=50)
-    course_name = models.CharField(max_length=200)
-    semester = models.CharField(max_length=50, blank=True)
-    year = models.IntegerField(null=True, blank=True)
-    grade = models.CharField(max_length=5, blank=True)
-    credits = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'parsed_courses'
-        ordering = ['year', 'semester', 'course_code']
-
-    def __str__(self):
-        return f"{self.course_code} - {self.course_name}"
+    class Config:
+        # Ensure exact field names in JSON output
+        populate_by_name = True
 
 
-class AIProcessingLog(models.Model):
-    """Log of AI processing attempts and results."""
-    transcript = models.ForeignKey(Transcript, on_delete=models.CASCADE, related_name='processing_logs')
-    processing_type = models.CharField(
-        max_length=50,
-        choices=[
-            ('extraction', 'Data Extraction'),
-            ('validation', 'Data Validation'),
-            ('enhancement', 'Data Enhancement'),
-        ],
-        default='extraction'
+class Transcript(BaseModel):
+    """
+    Complete transcript containing all courses.
+    CRITICAL: This is the top-level structure returned by LLM.
+    Reference: REWRITE_SPECIFICATION.md lines 264-270
+    """
+    courses: List[Course] = Field(
+        description="List of all courses extracted from transcript"
     )
-    status = models.CharField(
-        max_length=20,
-        choices=[
-            ('started', 'Started'),
-            ('completed', 'Completed'),
-            ('failed', 'Failed'),
-        ],
-        default='started'
-    )
-    model_used = models.CharField(max_length=50, default='gpt-4')
-    tokens_used = models.IntegerField(null=True, blank=True)
-    processing_time_seconds = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    error_message = models.TextField(blank=True)
-    result_data = models.JSONField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        db_table = 'ai_processing_logs'
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.processing_type} - {self.status} ({self.created_at})"
+    @field_validator('courses')
+    @classmethod
+    def validate_courses(cls, v):
+        if not v:
+            raise ValueError("Transcript must contain at least one course")
+        return v
