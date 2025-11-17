@@ -1,0 +1,76 @@
+# Core Django Framework
+Django==5.1.1
+djangorestframework==3.15.2
+daphne==4.1.2
+django-channels==4.1.0
+channels-redis==4.2.0
+
+# Database and ORM
+psycopg2-binary==2.9.10
+django-redis==5.4.0
+
+# PostGIS for geographic data
+# Note: Requires GDAL/GEOS libraries on Windows
+# Download OSGeo4W: https://trac.osgeo.org/osgeo4w/
+# OR use conda: conda install -c conda-forge gdal
+# django.contrib.gis will work in TEST mode without PostGIS
+
+# Authentication and Security
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.6.0
+PyJWT==2.10.1
+
+# AI/ML Stack
+langgraph==0.2.60
+langchain==0.3.16
+langchain-openai==0.2.3
+vanna==0.7.5
+pinecone-client==5.0.1
+cerebras-cloud-sdk==1.15.0
+langfuse==2.58.0
+litellm==1.50.3
+
+# Data Processing
+pandas==2.2.3
+numpy==2.2.1
+openpyxl==3.1.5
+
+# OpenAI and LLM
+openai==1.57.4
+anthropic==0.42.0
+google-generativeai==0.8.3
+
+# Async and Task Queue
+celery==5.4.0
+redis==5.2.1
+
+# API and HTTP
+requests==2.32.3
+httpx==0.28.1
+aiohttp==3.11.11
+
+# Validation
+pydantic==2.9.2
+pydantic-settings==2.7.1
+
+# Testing (for TEST mode)
+factory-boy==3.3.1
+Faker==33.1.0
+pytest==8.3.4
+pytest-django==4.9.0
+
+# Utilities
+python-dotenv==1.0.1
+python-dateutil==2.9.0.post0
+pytz==2024.2
+typing-extensions==4.12.2
+
+# File handling
+python-multipart==0.0.20
+Pillow==11.0.0
+
+# Markdown and documentation
+markdown==3.7
+
+# Environment variables
+environs==11.0.0
