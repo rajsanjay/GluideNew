@@ -1,0 +1,24 @@
+# Minimal requirements for testing Django models only
+# This skips AI/ML packages that have Python 3.13 compatibility issues
+
+# Core Django Framework
+Django==5.1.1
+djangorestframework==3.15.2
+
+# Database
+psycopg2-binary==2.9.10
+
+# Validation
+pydantic==2.9.2
+
+# Testing fixtures
+factory-boy==3.3.1
+Faker==33.1.0
+
+# Utilities
+python-dotenv==1.0.1
+pytz==2024.2
+typing-extensions==4.12.2
+
+# Optional but recommended
+django-cors-headers==4.6.0
