@@ -22,3 +22,4 @@ typing-extensions==4.12.2
 
 # Optional but recommended
 django-cors-headers==4.6.0
+django-celery-results==2.5.1

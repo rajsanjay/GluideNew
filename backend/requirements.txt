@@ -46,6 +46,7 @@ google-generativeai==0.8.3
 
 # Async and Task Queue
 celery==5.4.0
+django-celery-results==2.5.1
 redis==5.2.1
 
 # API and HTTP
