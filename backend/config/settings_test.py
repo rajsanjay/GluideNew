@@ -44,4 +44,8 @@ FIXTURE_DIRS = [
 # Test mode flag
 USE_TEST_MODE = True
 
-print("🧪 Running in TEST MODE with in-memory SQLite databases")
+# Remove GIS app if it was added (we don't need GDAL for SQLite testing)
+if 'django.contrib.gis' in INSTALLED_APPS:
+    INSTALLED_APPS.remove('django.contrib.gis')
+
+print("Running in TEST MODE with in-memory SQLite databases")

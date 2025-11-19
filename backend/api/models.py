@@ -9,6 +9,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 
+# Import course_db models so Django can resolve foreign key references
+# These models are used for foreign key relationships from this module
+from api import models_course_db  # noqa: F401
+
 
 class Session(models.Model):
     """Session model - lines 1433-1440"""
@@ -295,42 +299,3 @@ class StudentCourseSchedule(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.name}"
-
-
-# Placeholder models for foreign keys (actual tables in course_db)
-# These models are defined as managed=False and point to the course database
-
-class School(models.Model):
-    """School model - managed=False (exists in course_db)"""
-    school_id = models.BigAutoField(primary_key=True)
-
-    class Meta:
-        managed = False
-        db_table = 'school'
-
-
-class Course(models.Model):
-    """Course model - managed=False (exists in course_db)"""
-    id = models.BigAutoField(primary_key=True)
-
-    class Meta:
-        managed = False
-        db_table = 'courses'
-
-
-class Major(models.Model):
-    """Major model - managed=False (exists in course_db)"""
-    id = models.BigAutoField(primary_key=True)
-
-    class Meta:
-        managed = False
-        db_table = 'majors'
-
-
-class AcademicYear(models.Model):
-    """AcademicYear model - managed=False (exists in course_db)"""
-    id = models.BigAutoField(primary_key=True)
-
-    class Meta:
-        managed = False
-        db_table = 'academic_years'
