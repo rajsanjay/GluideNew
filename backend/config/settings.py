@@ -23,20 +23,35 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
 
     # Third party
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'channels',
-    'django_celery_results',
 
     # Local apps
     'api',
     'gluideme',
     'gluideai',
 ]
+
+# Conditionally add apps that require system libraries
+if not USE_TEST_MODE:
+    # Only add GIS support in DATABASE mode (requires GDAL/PostGIS)
+    INSTALLED_APPS.insert(6, 'django.contrib.gis')
+
+# Add optional apps if available
+try:
+    import channels
+    INSTALLED_APPS.append('channels')
+except ImportError:
+    pass
+
+try:
+    import django_celery_results
+    INSTALLED_APPS.append('django_celery_results')
+except ImportError:
+    pass
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
