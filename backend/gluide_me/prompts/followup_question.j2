@@ -1,0 +1,31 @@
+{# Template for generating follow-up questions #}
+{# This template provides context to the LLM for generating relevant follow-up questions #}
+
+Based on the conversation about {{ topic }}, generate 3-5 relevant follow-up questions.
+
+**Previous question:** {{ previous_question }}
+
+**Answer provided:**
+{{ answer }}
+
+**Context:**
+- Main Intent: {{ main_intent }}
+{% if acquired_params.to_collage %}- Target College: {{ acquired_params.to_collage }}{% endif %}
+{% if acquired_params.from_collage %}- Source College: {{ acquired_params.from_collage }}{% endif %}
+{% if acquired_params.major %}- Major: {{ acquired_params.major }}{% endif %}
+
+**Generate questions that:**
+1. Explore related topics (e.g., similar majors, alternative colleges, related courses)
+2. Dive deeper into the current topic (e.g., specific requirements, prerequisites, timelines)
+3. Address practical next steps (e.g., application process, advisor meetings, course planning)
+4. Consider student concerns (e.g., difficulty, time commitment, career prospects)
+5. Build on information already provided
+
+**Examples of good follow-up questions:**
+- "What are the prerequisite courses for [Major] at [College]?"
+- "How does [College A]'s [Major] program compare to [College B]'s?"
+- "When is the best time to start the transfer application process?"
+- "Are there any alternative majors with similar career outcomes?"
+- "What GPA is typically required for admission to [Major] at [College]?"
+
+Return your response as a JSON array of 3-5 questions.

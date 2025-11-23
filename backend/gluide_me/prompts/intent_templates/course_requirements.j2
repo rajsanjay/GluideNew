@@ -1,0 +1,21 @@
+{# Template for COURSE_REQUIREMENTS intent #}
+{# This template formats course requirements for majors/programs #}
+
+User asked: {{ user_query }}
+
+Found {{ result_count }} requirement(s) {% if acquired_params.major %}for {{ acquired_params.major }}{% endif %}{% if acquired_params.to_collage %} at {{ acquired_params.to_collage }}{% endif %}.
+
+{% if result_count > 0 %}
+Course Requirements:
+
+{% for result in results %}
+### {{ result.requirement_type or "Requirement" }}
+
+- **Course:** {{ result.course_code or result.course_name }}
+  {% if result.course_title %}- Title: {{ result.course_title }}{% endif %}
+  {% if result.units %}- Units: {{ result.units }}{% endif %}
+  {% if result.prerequisites %}- Prerequisites: {{ result.prerequisites }}{% endif %}
+  {% if result.required %}- Required: {{ "Yes" if result.required else "Elective" }}{% endif %}
+
+{% endfor %}
+{% endif %}

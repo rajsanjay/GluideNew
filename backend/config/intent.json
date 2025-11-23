@@ -1,0 +1,58 @@
+{
+  "GET_ALL_MAJORS": {
+    "description": "Get all available majors",
+    "required_params": [],
+    "templates": {
+      "LIST_ALL_MAJORS": "SELECT DISTINCT major_name, major_code FROM majors ORDER BY major_name;",
+      "LIST_BY_CATEGORY": "SELECT major_name, major_code, category FROM majors WHERE category = '{category}' ORDER BY major_name;",
+      "GENERAL": "SELECT DISTINCT major_name, major_code FROM majors ORDER BY major_name;"
+    },
+    "default_template": "SELECT DISTINCT major_name, major_code FROM majors ORDER BY major_name;"
+  },
+
+  "AVAILABLE_MAJORS": {
+    "description": "Get majors available at specific colleges",
+    "required_params": ["to_collage"],
+    "templates": {
+      "BY_COLLEGE_NAME": "SELECT DISTINCT m.major_name, m.major_code, s.school_name FROM majors m JOIN schools s ON m.school_id = s.school_id WHERE s.school_name ILIKE '%{to_collage}%' ORDER BY m.major_name;",
+      "BY_COLLEGE_TYPE": "SELECT DISTINCT m.major_name, m.major_code, s.school_name FROM majors m JOIN schools s ON m.school_id = s.school_id WHERE s.school_type = '{college_type}' ORDER BY s.school_name, m.major_name;",
+      "BY_LOCATION": "SELECT DISTINCT m.major_name, m.major_code, s.school_name FROM majors m JOIN schools s ON m.school_id = s.school_id WHERE s.location ILIKE '%{location}%' ORDER BY s.school_name, m.major_name;",
+      "GENERAL": "SELECT DISTINCT m.major_name, m.major_code, s.school_name FROM majors m JOIN schools s ON m.school_id = s.school_id WHERE s.school_name ILIKE '%{to_collage}%' ORDER BY m.major_name;"
+    },
+    "default_template": "SELECT DISTINCT m.major_name, m.major_code, s.school_name FROM majors m JOIN schools s ON m.school_id = s.school_id WHERE s.school_name ILIKE '%{to_collage}%' ORDER BY m.major_name;"
+  },
+
+  "COURSE_REQUIREMENTS": {
+    "description": "Get course requirements for majors",
+    "required_params": ["major", "to_collage"],
+    "templates": {
+      "BY_MAJOR": "SELECT r.requirement_type, c.course_code, c.course_title, c.units, r.is_required FROM requirements r JOIN courses c ON r.course_id = c.course_id JOIN majors m ON r.major_id = m.major_id JOIN schools s ON m.school_id = s.school_id WHERE m.major_name ILIKE '%{major}%' AND s.school_name ILIKE '%{to_collage}%' ORDER BY r.requirement_type, c.course_code;",
+      "BY_PROGRAM": "SELECT r.requirement_type, c.course_code, c.course_title, c.units FROM requirements r JOIN courses c ON r.course_id = c.course_id JOIN majors m ON r.major_id = m.major_id WHERE m.major_name ILIKE '%{major}%' ORDER BY r.requirement_type, c.course_code;",
+      "BY_TRANSFER_PATH": "SELECT r.requirement_type, c.course_code, c.course_title, a.from_course_code, a.from_course_title FROM requirements r JOIN courses c ON r.course_id = c.course_id JOIN articulations a ON c.course_id = a.to_course_id JOIN majors m ON r.major_id = m.major_id WHERE m.major_name ILIKE '%{major}%' ORDER BY r.requirement_type;",
+      "GENERAL": "SELECT r.requirement_type, c.course_code, c.course_title, c.units FROM requirements r JOIN courses c ON r.course_id = c.course_id JOIN majors m ON r.major_id = m.major_id JOIN schools s ON m.school_id = s.school_id WHERE m.major_name ILIKE '%{major}%' AND s.school_name ILIKE '%{to_collage}%' ORDER BY r.requirement_type, c.course_code;"
+    },
+    "default_template": "SELECT r.requirement_type, c.course_code, c.course_title, c.units FROM requirements r JOIN courses c ON r.course_id = c.course_id JOIN majors m ON r.major_id = m.major_id JOIN schools s ON m.school_id = s.school_id WHERE m.major_name ILIKE '%{major}%' AND s.school_name ILIKE '%{to_collage}%' ORDER BY r.requirement_type, c.course_code;"
+  },
+
+  "COURSE_TRANSFERABILITY": {
+    "description": "Get course transfer information",
+    "required_params": ["from_collage", "to_collage", "major"],
+    "templates": {
+      "SPECIFIC_COURSE": "SELECT a.from_course_code, a.from_course_title, a.to_course_code, a.to_course_title, s_from.school_name as from_school, s_to.school_name as to_school FROM articulations a JOIN schools s_from ON a.from_school_id = s_from.school_id JOIN schools s_to ON a.to_school_id = s_to.school_id WHERE s_from.school_name ILIKE '%{from_collage}%' AND s_to.school_name ILIKE '%{to_collage}%';",
+      "FROM_TO_COLLEGES": "SELECT a.from_course_code, a.from_course_title, a.to_course_code, a.to_course_title FROM articulations a JOIN schools s_from ON a.from_school_id = s_from.school_id JOIN schools s_to ON a.to_school_id = s_to.school_id WHERE s_from.school_name ILIKE '%{from_collage}%' AND s_to.school_name ILIKE '%{to_collage}%' ORDER BY a.from_course_code;",
+      "BY_MAJOR": "SELECT a.from_course_code, a.from_course_title, a.to_course_code, a.to_course_title, r.requirement_type FROM articulations a JOIN requirements r ON a.to_course_id = r.course_id JOIN majors m ON r.major_id = m.major_id JOIN schools s_from ON a.from_school_id = s_from.school_id JOIN schools s_to ON a.to_school_id = s_to.school_id WHERE s_from.school_name ILIKE '%{from_collage}%' AND s_to.school_name ILIKE '%{to_collage}%' AND m.major_name ILIKE '%{major}%' ORDER BY r.requirement_type, a.from_course_code;",
+      "GENERAL_TRANSFER": "SELECT a.from_course_code, a.from_course_title, a.to_course_code, a.to_course_title FROM articulations a JOIN schools s_from ON a.from_school_id = s_from.school_id JOIN schools s_to ON a.to_school_id = s_to.school_id WHERE s_from.school_name ILIKE '%{from_collage}%' AND s_to.school_name ILIKE '%{to_collage}%';",
+      "GENERAL": "SELECT a.from_course_code, a.from_course_title, a.to_course_code, a.to_course_title FROM articulations a JOIN schools s_from ON a.from_school_id = s_from.school_id JOIN schools s_to ON a.to_school_id = s_to.school_id WHERE s_from.school_name ILIKE '%{from_collage}%' AND s_to.school_name ILIKE '%{to_collage}%' ORDER BY a.from_course_code;"
+    },
+    "default_template": "SELECT a.from_course_code, a.from_course_title, a.to_course_code, a.to_course_title FROM articulations a JOIN schools s_from ON a.from_school_id = s_from.school_id JOIN schools s_to ON a.to_school_id = s_to.school_id WHERE s_from.school_name ILIKE '%{from_collage}%' AND s_to.school_name ILIKE '%{to_collage}%' ORDER BY a.from_course_code;"
+  },
+
+  "GENERAL": {
+    "description": "General queries",
+    "required_params": [],
+    "templates": {
+      "GENERAL": ""
+    },
+    "default_template": ""
+  }
+}

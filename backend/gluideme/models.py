@@ -396,3 +396,61 @@ class Document(models.Model):
 
     def __str__(self):
         return f"{self.title or self.filename} - {self.student.first_name}"
+
+
+class StudentTranscripts(models.Model):
+    """StudentTranscripts model for managing student transcript uploads and processing status."""
+    UNPROCESSED = 'unprocessed'
+    IN_PROGRESS = 'in_progress'
+    PROCESSED = 'processed'
+    FAILED = 'failed'
+
+    STATUS_CHOICES = [
+        (UNPROCESSED, 'Unprocessed'),
+        (IN_PROGRESS, 'In Progress'),
+        (PROCESSED, 'Processed'),
+        (FAILED, 'Failed'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    file_name = models.CharField(max_length=255)
+    file_url = models.URLField()
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=UNPROCESSED
+    )
+
+    class Meta:
+        db_table = 'gluideme_student_transcripts'
+
+    def __str__(self):
+        return f"{self.student.first_name} - {self.file_name} ({self.status})"
+
+
+class TranscriptWebhookCourses(models.Model):
+    """TranscriptWebhookCourses model for receiving parsed course data from gluideai."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    transcript = models.ForeignKey(
+        StudentTranscripts,
+        on_delete=models.CASCADE,
+        related_name='webhook_courses'
+    )
+    college = models.CharField(max_length=255, blank=True, null=True)
+    major = models.CharField(max_length=255, blank=True, null=True)
+    semester = models.CharField(max_length=50, blank=True, null=True)
+    year = models.CharField(max_length=10, blank=True, null=True)
+    course_code = models.CharField(max_length=50)
+    course_title = models.CharField(max_length=255)
+    credit = models.CharField(max_length=10, blank=True, null=True)
+    grade = models.CharField(max_length=5, blank=True, null=True)
+    status = models.CharField(max_length=20)
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'gluideme_transcript_webhooks'
+
+    def __str__(self):
+        return f"{self.transcript.student.first_name} - {self.course_code}"

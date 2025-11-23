@@ -1,0 +1,19 @@
+{# General fallback template for any intent #}
+{# Used when no specific template is available #}
+
+User asked: {{ user_query }}
+
+Found {{ result_count }} result(s).
+
+{% if result_count > 0 %}
+Results:
+
+{% for result in results %}
+{% for key, value in result.items() %}
+- **{{ key }}**: {{ value }}
+{% endfor %}
+
+---
+
+{% endfor %}
+{% endif %}

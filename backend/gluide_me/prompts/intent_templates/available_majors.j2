@@ -1,0 +1,17 @@
+{# Template for AVAILABLE_MAJORS intent #}
+{# This template formats results showing majors available at specific colleges #}
+
+User asked: {{ user_query }}
+
+Found {{ result_count }} major(s) {% if acquired_params.to_collage %}at {{ acquired_params.to_collage }}{% endif %}.
+
+{% if result_count > 0 %}
+Here are the majors:
+
+{% for result in results %}
+- **{{ result.major_name or result.name }}**{% if result.major_code %} ({{ result.major_code }}){% endif %}
+  {% if result.department %}- Department: {{ result.department }}{% endif %}
+  {% if result.degree_type %}- Degree: {{ result.degree_type }}{% endif %}
+  {% if result.units %}- Units Required: {{ result.units }}{% endif %}
+{% endfor %}
+{% endif %}

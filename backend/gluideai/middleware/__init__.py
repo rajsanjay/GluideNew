@@ -1,3 +1,0 @@
-"""
-Middleware for GluideAI app.
-"""

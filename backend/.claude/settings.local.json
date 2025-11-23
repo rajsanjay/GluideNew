@@ -1,11 +1,24 @@
 {
   "permissions": {
     "allow": [
-      "Bash(if exist apiadmin.py del apiadmin.py)",
-      "Bash(if exist gluideaiadmin.py del gluideaiadmin.py)",
-      "Bash(if exist gluidemeadmin.py del gluidemeadmin.py)",
-      "Bash(git config:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nFix Windows test environment setup and resolve all dependency issues\n\nThis commit resolves multiple issues encountered when setting up and testing\nthe Django monorepo on Windows with Python 3.12:\n\n1. Fixed GDAL library error in test mode:\n   - Modified config/settings_test.py to explicitly remove django.contrib.gis\n     from INSTALLED_APPS after import\n   - Added conditional logic to skip GIS support in TEST mode since\n     GDAL/PostGIS isn''t needed for SQLite in-memory databases\n   - Removed Unicode emoji from print statement to fix Windows encoding error\n\n2. Fixed model conflicts and foreign key resolution:\n   - Removed duplicate School, Course, Major, AcademicYear models from\n     api/models.py (lines 303-337)\n   - Added import of api.models_course_db in api/models.py to ensure Django\n     can resolve foreign key string references\n   - These models now only exist in models_course_db.py as unmanaged models\n\n3. Fixed admin registration errors:\n   - Cleared api/admin.py, gluideme/admin.py, gluideai/admin.py to remove\n     imports of non-existent models (Student, Transcript, SavedCourse,\n     Counselor, etc.)\n   - Added TODO comments to register actual models once finalized\n\n4. Enhanced quick_test.py for Windows compatibility:\n   - Replaced all Unicode characters (checkmarks, X marks, emojis) with\n     ASCII equivalents ([OK], [ERROR], [WARN], [SUCCESS]) to fix Windows\n     console encoding (cp1252) errors\n   - Added setup_test_databases() function to run migrations before tests\n   - Modified test_course_db_models() to skip in TEST mode with informative\n     message since those tables are managed=False and represent external\n     database\n\n5. Test Results:\n   - All 7/7 tests now pass successfully\n   - Environment configuration: PASS\n   - Primary Models (api.models): PASS\n   - Course DB Models (managed=False): PASS (skipped appropriately)\n   - Gluideme Models: PASS\n   - Pydantic Models: PASS\n   - Foreign Key Relationships: PASS\n   - Database Router: PASS\n\nThe Django monorepo can now be tested successfully on Windows using in-memory\nSQLite databases without requiring GDAL, PostGIS, or external database setup.\n\nGenerated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gluideaillmbase.py)",
+      "Bash(cat:*)",
+      "Bash(dir:*)",
+      "Bash(npx create-next-app@15.0.4 counselor-frontend --typescript --tailwind --eslint --app --src-dir --no-git)",
+      "Bash(printf:*)",
+      "Bash(npx create-next-app@15.0.4 counselor-frontend --typescript --tailwind --eslint --app --src-dir --no-git --use-npm)",
+      "Bash(npm audit fix:*)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn-ui@latest init:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(echo:*)",
+      "Bash(npx shadcn@latest add accordion alert-dialog avatar button calendar card checkbox dialog dropdown-menu input label popover select separator sheet skeleton table tabs textarea toast tooltip --overwrite --yes)",
+      "Bash(test:*)",
+      "Bash(npm run build:*)",
+      "Bash(if exist \"src\\app\\(dashboard)\" rmdir /s /q \"src\\app\\(dashboard)\")"
     ],
     "deny": [],
     "ask": []

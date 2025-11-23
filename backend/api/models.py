@@ -162,12 +162,20 @@ class CounselorDefaultCollege(models.Model):
 
 class CounselorAssignedCollege(models.Model):
     """CounselorAssignedCollege model - lines 1534-1542"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    school = models.ForeignKey('School', on_delete=models.CASCADE, db_column='school_id')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='assigned_colleges'
+    )
+    school = models.ForeignKey(
+        'School',
+        on_delete=models.CASCADE
+    )
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        db_table = 'counselor_assigned_colleges'
+        db_table = 'api_counselor_assigned_colleges'
+        unique_together = ['user', 'school']
 
     def __str__(self):
         return f"{self.user.username} assigned college"
@@ -175,22 +183,49 @@ class CounselorAssignedCollege(models.Model):
 
 class ConnectionRequest(models.Model):
     """ConnectionRequest model - lines 1544-1556"""
+    PENDING = 'PENDING'
+    ACCEPTED = 'ACCEPTED'
+    REJECTED = 'REJECTED'
+    CANCELLED = 'CANCELLED'
+
     STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
-        ('ACCEPTED', 'Accepted'),
-        ('REJECTED', 'Rejected'),
-        ('CANCELLED', 'Cancelled'),
+        (PENDING, 'Pending'),
+        (ACCEPTED, 'Accepted'),
+        (REJECTED, 'Rejected'),
+        (CANCELLED, 'Cancelled'),
     ]
 
-    requesting_user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='requested_connections')
-    requested_user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='incoming_connections')
-    school = models.ForeignKey('School', on_delete=models.PROTECT, db_column='school_id')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    requesting_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sent_connection_requests'
+    )
+    requested_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='received_connection_requests'
+    )
+    school = models.ForeignKey(
+        'School',
+        on_delete=models.CASCADE
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=PENDING
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     actioned_at = models.DateTimeField(null=True, blank=True)
+    room = models.ForeignKey(
+        'Room',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     class Meta:
-        db_table = 'connection_requests'
+        db_table = 'api_connection_requests'
+        unique_together = ['requesting_user', 'requested_user', 'school']
 
     def __str__(self):
         return f"{self.requesting_user.username} -> {self.requested_user.username}"
@@ -198,13 +233,17 @@ class ConnectionRequest(models.Model):
 
 class File(models.Model):
     """File model - lines 1558-1568"""
-    name = models.CharField(max_length=256)
-    file_path = models.FileField(upload_to='documents/')
+    name = models.CharField(max_length=255)
+    file_path = models.FileField(upload_to='uploads/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    uploaded_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True
+    )
 
     class Meta:
-        db_table = 'files'
+        db_table = 'api_files'
 
     def __str__(self):
         return self.name
@@ -212,12 +251,20 @@ class File(models.Model):
 
 class Room(models.Model):
     """Room model - lines 1570-1579"""
-    student = models.ForeignKey(User, on_delete=models.PROTECT, related_name='student_rooms')
-    counselor = models.ForeignKey(User, on_delete=models.PROTECT, related_name='counselor_rooms')
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='student_rooms'
+    )
+    counselor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='counselor_rooms'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'rooms'
+        db_table = 'api_rooms'
 
     def __str__(self):
         return f"Room: {self.student.username} - {self.counselor.username}"
@@ -225,11 +272,11 @@ class Room(models.Model):
 
 class StudentDocument(models.Model):
     """StudentDocument model - lines 1581-1589"""
-    file = models.ForeignKey(File, on_delete=models.PROTECT)
-    room = models.ForeignKey(Room, on_delete=models.PROTECT)
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'student_documents'
+        db_table = 'api_student_documents'
 
     def __str__(self):
         return f"Document in room {self.room.id}"
@@ -237,15 +284,22 @@ class StudentDocument(models.Model):
 
 class ChatMessage(models.Model):
     """ChatMessage model - lines 1591-1603"""
-    room = models.ForeignKey(Room, on_delete=models.PROTECT)
-    sender = models.ForeignKey(User, on_delete=models.PROTECT)
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.CASCADE,
+        related_name='chat_messages'
+    )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'chat_messages'
-        ordering = ['-created_at']
+        db_table = 'api_chat_messages'
+        ordering = ['created_at']
 
     def __str__(self):
         return f"{self.sender.username}: {self.message[:30]}"
@@ -253,15 +307,18 @@ class ChatMessage(models.Model):
 
 class MeetingSchedule(models.Model):
     """MeetingSchedule model - lines 1605-1617"""
-    room = models.ForeignKey(Room, on_delete=models.PROTECT)
-    event_title = models.CharField(max_length=256)
-    event_description = models.TextField()
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    event_title = models.CharField(max_length=255)
+    event_description = models.TextField(blank=True)
     schedule_time = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
 
     class Meta:
-        db_table = 'meeting_schedules'
+        db_table = 'api_meeting_schedules'
 
     def __str__(self):
         return self.event_title

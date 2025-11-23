@@ -41,6 +41,17 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'gluideme', 'fixtures'),
 ]
 
+# Transcript parser settings (test values)
+STATIC_TOKEN = 'test-token-123'
+GLUIDE_ME_BACKEND_TOKEN = 'test-backend-token-123'
+
+# Celery Configuration for TEST mode
+# Use in-memory broker for testing
+CELERY_TASK_ALWAYS_EAGER = True  # Execute tasks synchronously
+CELERY_TASK_EAGER_PROPAGATES = True  # Propagate exceptions
+CELERY_BROKER_URL = 'memory://'
+CELERY_RESULT_BACKEND = 'cache+memory://'
+
 # Test mode flag
 USE_TEST_MODE = True
 
